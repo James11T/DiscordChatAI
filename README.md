@@ -36,4 +36,5 @@ CREATE TABLE `statement` (
 	`in_response_to` VARCHAR(255) NOT NULL,
 	`personality` VARCHAR(64) NOT NULL DEFAULT 'normal',
 	PRIMARY KEY (`id`)
-);```
+);
+```
