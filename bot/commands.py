@@ -1,4 +1,5 @@
 from bot import client, chat_bot
+from bot.config import config
 
 
 @client.command(pass_context=True)
