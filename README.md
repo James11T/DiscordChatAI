@@ -19,3 +19,21 @@ All of the config can be done in the `config.json` file.
 | DB_IP                 | The IP for the database host.                                                                          | "localhost"          |
 | DB_NAME               | The name of the database.                                                                              | "chatbotDB"          |
 | CHANNEL_PERSONALITIES | A key value pair with the key as a discord channel ID as a string and the value as a personality name. | {}                   |
+## Database Structure
+### statement
+| Field          | Type         | Nullabe | Primary Key | Default |
+|----------------|--------------|---------|-------------|---------|
+| id             | int          | no      | yes         | -       |
+| text           | varchar(255) | no      | no          | -       |
+| in_response_to | varchar(255) | no      | no          | -       |
+| personality    | varchar(64)  | no      | no          | normal  |
+
+MySQL
+```sql
+CREATE TABLE `statement` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`text` VARCHAR(255) NOT NULL,
+	`in_response_to` VARCHAR(255) NOT NULL,
+	`personality` VARCHAR(64) NOT NULL DEFAULT 'normal',
+	PRIMARY KEY (`id`)
+);```
