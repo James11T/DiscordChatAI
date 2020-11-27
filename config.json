@@ -12,6 +12,6 @@
     "DB_NAME": "chatbotDB",
     "CHANNEL_PERSONALITIES": {
         "Channel ID": "Personality Name",
-        "Another channel ID", "A different or the same personality"
+        "Another channel ID": "A different or the same personality"
     }
 }
