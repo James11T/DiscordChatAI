@@ -21,12 +21,12 @@ All of the config can be done in the `config.json` file.
 | CHANNEL_PERSONALITIES | A key value pair with the key as a discord channel ID as a string and the value as a personality name. | {}                   |
 ## Database Structure
 ### statement
-| Field          | Type         | Nullabe | Primary Key | Default |
-|----------------|--------------|---------|-------------|---------|
-| id             | int          | no      | yes         | -       |
-| text           | varchar(255) | no      | no          | -       |
-| in_response_to | varchar(255) | no      | no          | -       |
-| personality    | varchar(64)  | no      | no          | normal  |
+| Field          | Type         | Nullable | Primary Key | Default |
+|----------------|--------------|----------|-------------|---------|
+| id             | int          | no       | yes         | -       |
+| text           | varchar(255) | no       | no          | -       |
+| in_response_to | varchar(255) | no       | no          | -       |
+| personality    | varchar(64)  | no       | no          | normal  |
 
 MySQL
 ```sql
