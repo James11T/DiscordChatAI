@@ -1,0 +1,13 @@
+{
+    "BOT_TOKEN": "Put your token here",
+    "BOT_PREFIX": ">",
+    "BOT_STATUS": "Train me to speak!",
+    "RESPONSE_TIMEOUT": 30,
+    "MINIMUM_CONFIDENCE": 0.4,
+    "MAXIMUM_CONFIDENCE": 1,
+    "DB_PROTOCOL": "mysql+pymysql",
+    "DB_USERNAME": "username",
+    "DB_PASSWORD" : "password",
+    "DB_IP": "127.0.0.1",
+    "DB_NAME": "chatbotDB"
+}
