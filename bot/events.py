@@ -1,4 +1,4 @@
-from bot import client, chat_bot, channel_to_personality
+from bot import client, chat_bot
 from discord import Game
 
 from bot.config import config
@@ -40,7 +40,7 @@ async def on_message(message):
     if message.content.startswith(client.command_prefix):
         return await client.process_commands(message)
 
-    if not str(message.channel.id) in channel_to_personality:
+    if not str(message.channel.id) in config["CHANNEL_PERSONALITIES"]:
         return
 
     if len(message.content) > 255:
@@ -51,7 +51,7 @@ async def on_message(message):
         if time.time() - message_buffer[str(message.author.id)] < response_timeout:
             return
 
-    personality = channel_to_personality[str(message.channel.id)]
+    personality = config["CHANNEL_PERSONALITIES"][str(message.channel.id)]
 
     response = chat_bot.get_response(personality, message.content)
 

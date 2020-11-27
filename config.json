@@ -9,5 +9,9 @@
     "DB_USERNAME": "username",
     "DB_PASSWORD" : "password",
     "DB_IP": "127.0.0.1",
-    "DB_NAME": "chatbotDB"
+    "DB_NAME": "chatbotDB",
+    "CHANNEL_PERSONALITIES": {
+        "Channel ID": "Personality Name",
+        "Another channel ID", "A different or the same personality"
+    }
 }
