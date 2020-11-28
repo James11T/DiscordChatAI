@@ -2,7 +2,7 @@ from bot.config import config
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, distinct
 from sqlalchemy import Column, Integer, String
 
 import nltk
@@ -62,7 +62,7 @@ class ChatBot:
 
         if len(statements) == 0:
             # No statements
-            return ":thinking: Sorry, I could not think of a god response."
+            return ":thinking: Sorry, I could not think of a god response. (1)"
 
         value_list = []
         weight_list = []
@@ -75,7 +75,7 @@ class ChatBot:
 
         if len(value_list) == 0:
             # No valid similar inputs
-            return ":thinking: Sorry, I could not think of a god response."
+            return ":thinking: Sorry, I could not think of a god response. (2)"
 
         # Generate a weighted random
         choice = random.choices(value_list, weights=weight_list, k=1)[0]
@@ -114,11 +114,9 @@ class ChatBot:
         in_db = self.session.query(Statement).filter_by(text=good_response, in_response_to=in_text,
                                                         personality=personality).first()
         if in_db:
-            print("Already a known response")
             in_db.weight += 1
             self.session.commit()
         else:
-            print("Adding a new statement")
             new_statement = Statement(text=good_response, in_response_to=in_text, personality=personality)
             self.session.add(new_statement)
             self.session.commit()
@@ -139,4 +137,10 @@ class ChatBot:
             return []
         return self.session.query(Statement).filter_by(personality=personality).all()
 
+    def get_total_entries(self):
+        entries = self.session.query(Statement).all()
+        return len(entries)
 
+    def get_total_personalities(self):
+        entries = self.session.query(distinct(Statement.personality)).all()
+        return len(entries)
