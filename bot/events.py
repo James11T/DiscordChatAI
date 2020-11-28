@@ -79,7 +79,7 @@ async def on_message(message):
                                                                  message.content + "` would have been!")
 
             def check2(m):
-                return m.author == message.author
+                return m.author == message.author and len(m.content) > 0
 
             try:
                 # Wait for better response
