@@ -6,6 +6,8 @@ from sqlalchemy import create_engine, distinct
 from sqlalchemy import Column, Integer, String
 
 import nltk
+from nltk.corpus import stopwords
+
 import random
 
 DATABASE_PROTOCOL = config["DB_PROTOCOL"]
@@ -27,6 +29,19 @@ class Statement(Base):
     weight = Column(Integer, nullable=False, default=1)
 
 
+def process_text(in_text):
+    stop_words = stopwords.words("english")
+    ns = " ".join([w for w in in_text.split(" ") if w not in stop_words])
+    if len(ns) == 0:
+        ns = in_text
+    return ns
+
+
+def dist(s1, s2):
+    # Find the similarity of the two given string between 0 and 1
+    return 1 - (nltk.edit_distance(s1, s2) / max(len(s1), len(s2)))
+
+
 class ChatBot:
     def __init__(self, min_similarity, max_similarity):
         self.engine = None
@@ -34,11 +49,6 @@ class ChatBot:
         self.connected = False
         self.min_similarity = min_similarity
         self.max_similarity = max_similarity
-
-    @staticmethod
-    def dist(s1, s2):
-        # Find the similarity of the two given string between 0 and 1
-        return 1 - (nltk.edit_distance(s1, s2) / max(len(s1), len(s2)))
 
     def is_valid_dist(self, d):
         # Checks if the distance is acceptable
@@ -67,8 +77,10 @@ class ChatBot:
         value_list = []
         weight_list = []
 
+        in_text = process_text(in_text)
+
         for s in statements:
-            get_dist = self.dist(s.in_response_to, in_text)
+            get_dist = dist(s.in_response_to, in_text)
             if self.is_valid_dist(get_dist):
                 value_list.append(s.text)
                 weight_list.append(get_dist * s.weight)
@@ -111,18 +123,18 @@ class ChatBot:
         if not self.connected:
             return
 
-        in_db = self.session.query(Statement).filter_by(text=good_response, in_response_to=in_text,
+        in_db = self.session.query(Statement).filter_by(text=good_response, in_response_to=process_text(in_text),
                                                         personality=personality).first()
         if in_db:
             in_db.weight += 1
             self.session.commit()
         else:
-            new_statement = Statement(text=good_response, in_response_to=in_text, personality=personality)
+            new_statement = Statement(text=good_response, in_response_to=process_text(in_text), personality=personality)
             self.session.add(new_statement)
             self.session.commit()
 
     def disencourage_response(self, personality, in_text, bad_response):
-        in_db = self.session.query(Statement).filter_by(text=bad_response, in_response_to=in_text,
+        in_db = self.session.query(Statement).filter_by(text=bad_response, in_response_to=process_text(in_text),
                                                         personality=personality).first()
 
         if in_db:
