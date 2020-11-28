@@ -27,6 +27,7 @@ All of the config can be done in the `config.json` file.
 | text           | varchar(255) | no       | no          | -       |
 | in_response_to | varchar(255) | no       | no          | -       |
 | personality    | varchar(64)  | no       | no          | normal  |
+| weight         | int          | no       | no          | 1  |
 
 MySQL
 ```sql
