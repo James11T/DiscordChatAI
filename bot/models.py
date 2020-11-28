@@ -72,7 +72,7 @@ class ChatBot:
 
         if len(statements) == 0:
             # No statements
-            return ":thinking: Sorry, I could not think of a god response. (1)"
+            return ":thinking: Sorry, I could not think of a good response."
 
         value_list = []
         weight_list = []
@@ -87,7 +87,7 @@ class ChatBot:
 
         if len(value_list) == 0:
             # No valid similar inputs
-            return ":thinking: Sorry, I could not think of a god response. (2)"
+            return ":thinking: Sorry, I could not think of a good response."
 
         # Generate a weighted random
         choice = random.choices(value_list, weights=weight_list, k=1)[0]
