@@ -69,7 +69,7 @@ async def on_message(message):
     except asyncio.TimeoutError:
         pass
     else:
-        if str(reaction.emoji) in [good_response, neutral_response] :
+        if str(reaction.emoji) in [bad_response, neutral_response]:
             # Ask for better response
             invoke_time = time.time()
             message_buffer[str(message.author.id)] = invoke_time
