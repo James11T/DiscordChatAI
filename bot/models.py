@@ -24,6 +24,7 @@ class Statement(Base):
     text = Column(String(255), nullable=False)
     in_response_to = Column(String(255), nullable=False)
     personality = Column(String(64), nullable=False, default="normal")
+    weight = Column(Integer, nullable=False, default=1)
 
 
 class ChatBot:
@@ -36,12 +37,15 @@ class ChatBot:
 
     @staticmethod
     def dist(s1, s2):
+        # Find the similarity of the two given string between 0 and 1
         return 1 - (nltk.edit_distance(s1, s2) / max(len(s1), len(s2)))
 
-    def is_valid(self, s1, s2):
-        return self.min_similarity <= self.dist(s1, s2) <= self.max_similarity
+    def is_valid_dist(self, d):
+        # Checks if the distance is acceptable
+        return self.min_similarity <= d <= self.max_similarity
 
     def connect(self):
+        # Connect to the database
         self.engine = create_engine(
             f"{DATABASE_PROTOCOL}://{DATABASE_USERNAME}:{DATABASE_PASSWORD}@{DATABASE_IP}/{DATABASE_NAME}"
         )
@@ -49,23 +53,86 @@ class ChatBot:
         self.connected = True
 
     def get_response(self, personality, in_text):
+        # Generate a response based on the personality and the input
         if not self.connected:
             return "The database is not currently connected"
 
-        statements = self.session.query(Statement).filter_by(personality=personality)
-        similar_queries = [s.text for s in statements if self.is_valid(s.in_response_to, in_text)]
+        # Get all responses
+        statements = self.session.query(Statement).filter_by(personality=personality).all()
 
-        if len(similar_queries) > 0:
-            return random.choice(similar_queries)
-        else:
-            return in_text
+        if len(statements) == 0:
+            # No statements
+            return ":thinking: Sorry, I could not think of a god response."
+
+        value_list = []
+        weight_list = []
+
+        for s in statements:
+            get_dist = self.dist(s.in_response_to, in_text)
+            if self.is_valid_dist(get_dist):
+                value_list.append(s.text)
+                weight_list.append(get_dist * s.weight)
+
+        if len(value_list) == 0:
+            # No valid similar inputs
+            return ":thinking: Sorry, I could not think of a god response."
+
+        # Generate a weighted random
+        choice = random.choices(value_list, weights=weight_list, k=1)[0]
+
+        return choice
+
+    def normalise_database(self):
+        # Remove repeats while adjusting weights
+        done = False
+        target_index = self.session.query(Statement).first().id
+        final_id = self.session.query(Statement).all()[-1].id
+
+        while not done:
+            base_state = self.session.query(Statement).filter_by(id=target_index).first()
+            if base_state:
+                if not base_state.weight:
+                    base_state.weight = 1
+                dupes = self.session.query(Statement).filter_by(text=base_state.text,
+                                                                in_response_to=base_state.in_response_to).all()
+                if len(dupes) > 0:
+                    for dupe in dupes:
+                        if dupe.id != base_state.id and dupe != base_state:
+                            base_state.weight += 1
+                            self.session.delete(dupe)
+
+            if target_index > final_id:
+                break
+
+            target_index += 1
+            self.session.commit()
 
     def learn_response(self, personality, in_text, good_response):
         if not self.connected:
             return
-        new_statement = Statement(text=good_response, in_response_to=in_text, personality=personality)
-        self.session.add(new_statement)
-        self.session.commit()
+
+        in_db = self.session.query(Statement).filter_by(text=good_response, in_response_to=in_text,
+                                                        personality=personality).first()
+        if in_db:
+            print("Already a known response")
+            in_db.weight += 1
+            self.session.commit()
+        else:
+            print("Adding a new statement")
+            new_statement = Statement(text=good_response, in_response_to=in_text, personality=personality)
+            self.session.add(new_statement)
+            self.session.commit()
+
+    def disencourage_response(self, personality, in_text, bad_response):
+        in_db = self.session.query(Statement).filter_by(text=bad_response, in_response_to=in_text,
+                                                        personality=personality).first()
+
+        if in_db:
+            if in_db.weight > 1:
+                in_db.weight -= 1
+            else:
+                self.session.delete(in_db)
+            self.session.commit()
 
     def get_personality_entries(self, personality):
         if not self.connected:

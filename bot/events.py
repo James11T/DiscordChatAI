@@ -92,6 +92,7 @@ async def on_message(message):
                 await better_response_message.delete()
             else:
                 chat_bot.learn_response(personality, message.content, better_message.content)
+                chat_bot.disencourage_response(personality, message.content, response)
                 message_buffer[str(message.author.id)] = 0
                 await response_message.edit(content=better_message.content)
                 await better_message.delete()
