@@ -55,49 +55,59 @@ async def on_message(message):
 
     response = chat_bot.get_response(personality, message.content)
 
-    response_message = await message.channel.send(response)
-    await add_reactions(response_message)
+    prompt_improvement = False
 
-    def check(new_reaction, new_user):
-        return (new_user == message.author and
-                str(new_reaction.emoji) in [good_response, bad_response, neutral_response] and
-                new_reaction.message == response_message)
-
-    try:
-        # Wait for reaction
-        reaction, user = await client.wait_for("reaction_add", timeout=response_timeout, check=check)
-    except asyncio.TimeoutError:
-        pass
+    if len(response) == 0:
+        prompt_improvement = True
+        response_message = await message.channel.send(":thinking: Sorry, I could not think of a good response.")
     else:
-        if str(reaction.emoji) in [bad_response, neutral_response]:
-            # Ask for better response
-            invoke_time = time.time()
-            message_buffer[str(message.author.id)] = invoke_time
+        response_message = await message.channel.send(response)
+        await add_reactions(response_message)
 
-            better_response_message = await message.channel.send(message.author.mention +
-                                                                 " please tell me what a good response to `" +
-                                                                 message.content + "` would have been!")
+        def check(new_reaction, new_user):
+            return (new_user == message.author and
+                    str(new_reaction.emoji) in [good_response, bad_response, neutral_response] and
+                    new_reaction.message == response_message)
 
-            def check2(m):
-                return m.author == message.author and len(m.content) > 0
+        try:
+            # Wait for reaction
+            reaction, user = await client.wait_for("reaction_add", timeout=response_timeout, check=check)
+        except asyncio.TimeoutError:
+            pass
+        else:
+            if str(reaction.emoji) in [bad_response, neutral_response]:
+                prompt_improvement = True
+            elif str(reaction.emoji) == good_response:
+                chat_bot.learn_response(personality, message.content, response)
+            # Remove reactions
 
-            try:
-                # Wait for better response
-                better_message = await client.wait_for("message", timeout=response_timeout, check=check2)
-            except asyncio.TimeoutError:
-                # Stop waiting
-                if invoke_time == message_buffer[str(message.author.id)]:
-                    # Reset waiter
-                    message_buffer[str(message.author.id)] = 0
-                await better_response_message.delete()
-            else:
-                chat_bot.learn_response(personality, message.content, better_message.content)
-                chat_bot.discourage_response(personality, message.content, response)
+    if prompt_improvement:
+        # Ask for better response
+        invoke_time = time.time()
+        message_buffer[str(message.author.id)] = invoke_time
+
+        better_response_message = await message.channel.send(message.author.mention +
+                                                             " please tell me what a good response to `" +
+                                                             message.content + "` would be!")
+
+        def check2(m):
+            return m.author == message.author and len(m.content) > 0
+
+        try:
+            # Wait for better response
+            better_message = await client.wait_for("message", timeout=response_timeout, check=check2)
+        except asyncio.TimeoutError:
+            # Stop waiting
+            if invoke_time == message_buffer[str(message.author.id)]:
+                # Reset waiter
                 message_buffer[str(message.author.id)] = 0
-                await response_message.edit(content=better_message.content)
-                await better_message.delete()
-                await better_response_message.delete()
-        elif str(reaction.emoji) == good_response:
-            chat_bot.learn_response(personality, message.content, response)
-        # Remove reactions
+            await better_response_message.delete()
+        else:
+            chat_bot.learn_response(personality, message.content, better_message.content)
+            chat_bot.discourage_response(personality, message.content, response)
+            message_buffer[str(message.author.id)] = 0
+            await response_message.edit(content=better_message.content)
+            await better_message.delete()
+            await better_response_message.delete()
+
         await remove_reactions(response_message)
