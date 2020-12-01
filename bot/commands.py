@@ -23,7 +23,7 @@ async def entrycount(ctx):
 
 @client.command(pass_context=True)
 async def normalise(ctx):
-    if str(ctx.author.id) != str(client.owner_id):
+    if str(ctx.author.id) != config["OWNER_ID"]:
         return
     await ctx.send("Normalising database")
     chat_bot.normalise_database()

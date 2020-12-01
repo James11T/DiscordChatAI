@@ -59,7 +59,7 @@ async def on_message(message):
 
     if len(response) == 0:
         prompt_improvement = True
-        response_message = await message.channel.send(":thinking: Sorry, I could not think of a good response.")
+        response_message = await message.channel.send(config["UNKNOWN_RESPONSE"])
     else:
         response_message = await message.channel.send(response)
         await add_reactions(response_message)

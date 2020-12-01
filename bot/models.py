@@ -34,7 +34,7 @@ def process_text(in_text):
     ns = " ".join([w for w in in_text.split(" ") if w not in stop_words])
     if len(ns) == 0:
         ns = in_text
-    return ns
+    return ns.lower()
 
 
 def dist(s1, s2):
@@ -86,7 +86,7 @@ class ChatBot:
 
         if len(statements) == 0:
             # No statements
-            return ":thinking: Sorry, I could not think of a good response."
+            return ""
 
         value_list = []
         weight_list = []
@@ -101,7 +101,7 @@ class ChatBot:
 
         if len(value_list) == 0:
             # No valid similar inputs
-            return ":thinking: Sorry, I could not think of a good response."
+            return ""
 
         # Generate a weighted random
         choice = random.choices(value_list, weights=weight_list, k=1)[0]
@@ -118,6 +118,7 @@ class ChatBot:
         while not done:
             base_state = self.session.query(Statement).filter_by(id=target_index).first()
             if base_state:
+                base_state.in_response_to = base_state.in_response_to.lower()
                 if not base_state.weight:
                     base_state.weight = 1
                 dupes = self.session.query(Statement).filter_by(text=base_state.text,
@@ -130,7 +131,6 @@ class ChatBot:
 
             if target_index > final_id:
                 break
-
             target_index += 1
             self.session.commit()
             self.session.close()
