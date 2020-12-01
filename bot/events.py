@@ -110,4 +110,4 @@ async def on_message(message):
             await better_message.delete()
             await better_response_message.delete()
 
-        await remove_reactions(response_message)
+    await remove_reactions(response_message)
