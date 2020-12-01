@@ -5,20 +5,23 @@ This requires an SQL database to store the learning.
 ## Config
 All of the config can be done in the `config.json` file.
 
-| Flag                  | Usage                                                                                                  | Default              |
-|-----------------------|--------------------------------------------------------------------------------------------------------|----------------------|
-| BOT_TOKEN             | The discord token for your bot.                                                                        | -                    |
-| BOT_PREFIX            | The prefix used for chat commands.                                                                     | ">"                  |
-| BOT_STATUS            | The playing status your bot will display.                                                              | "Train me to speak!" |
-| RESPONSE_TIMEOUT      | How long the bot will wait for responses.                                                              | 30                   |
-| MINIMUM_CONFIDENCE    | The minimum confidence for a response to be considered.                                                | 0.4                  |
-| MAXIMUM_CONFIDENCE    | The maximum confidence for a response to be considered.                                                | 1                    |
-| DB_PROTOCOL           | The protocol used to access the database.                                                              | "mysql+pymysql"      |
-| DB_USERNAME           | The username for the database.                                                                         | "username"           |
-| DB_PASSWORD           | The password to the database.                                                                          | "password"           |
-| DB_IP                 | The IP for the database host.                                                                          | "localhost"          |
-| DB_NAME               | The name of the database.                                                                              | "chatbotDB"          |
-| CHANNEL_PERSONALITIES | A key value pair with the key as a discord channel ID as a string and the value as a personality name. | {}                   |
+| Flag                  | Usage                                                                                                  | Default                                                  |
+|-----------------------|--------------------------------------------------------------------------------------------------------|----------------------------------------------------------|
+| BOT_TOKEN             | The discord token for your bot.                                                                        | -                                                        |
+| BOT_PREFIX            | The prefix used for chat commands.                                                                     | ">"                                                      |
+| BOT_STATUS            | The playing status your bot will display.                                                              | "Train me to speak!"                                     |
+| RESPONSE_TIMEOUT      | How long the bot will wait for responses.                                                              | 30                                                       |
+| MINIMUM_CONFIDENCE    | The minimum confidence for a response to be considered.                                                | 0.4                                                      |
+| MAXIMUM_CONFIDENCE    | The maximum confidence for a response to be considered.                                                | 1                                                        |
+| DB_PROTOCOL           | The protocol used to access the database.                                                              | "mysql+pymysql"                                          |
+| DB_USERNAME           | The username for the database.                                                                         | "username"                                               |
+| DB_PASSWORD           | The password to the database.                                                                          | "password"                                               |
+| DB_IP                 | The IP for the database host.                                                                          | "localhost"                                              |
+| DB_NAME               | The name of the database.                                                                              | "chatbotDB"                                              |
+| UNKNOWN_RESPONSE      | The response the bot gives when it cant think of a good response .                                     | ":thinking: Sorry, I could not think of a good response."|
+| OWNER_ID              | The bot owners discord ID as a string.                                                                 | "123"                                                    |
+| CHANNEL_PERSONALITIES | A key value pair with the key as a discord channel ID as a string and the value as a personality name. | {}                                                       |
+
 ## Database Structure
 ### statement
 | Field          | Type         | Nullable | Primary Key | Default |
@@ -29,7 +32,7 @@ All of the config can be done in the `config.json` file.
 | personality    | varchar(64)  | no       | no          | normal  |
 | weight         | int          | no       | no          | 1  |
 
-MySQL
+`MySQL`
 ```sql
 CREATE TABLE `statement` (
 	`id` INT NOT NULL AUTO_INCREMENT,
