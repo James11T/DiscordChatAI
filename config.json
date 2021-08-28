@@ -10,7 +10,7 @@
     "DB_PASSWORD" : "password",
     "DB_IP": "127.0.0.1",
     "DB_NAME": "chatbotDB",
-    "UNKNOWN_RESPONSE": "🤔 Sorry, I could not think of a good response."
+    "UNKNOWN_RESPONSE": "🤔 Sorry, I could not think of a good response.",
     "CHANNEL_PERSONALITIES": {
         "Channel ID": "Personality Name",
         "Another channel ID": "A different or the same personality"
