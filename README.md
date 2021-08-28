@@ -39,6 +39,7 @@ CREATE TABLE `statement` (
 	`text` VARCHAR(255) NOT NULL,
 	`in_response_to` VARCHAR(255) NOT NULL,
 	`personality` VARCHAR(64) NOT NULL DEFAULT 'normal',
+	`weight` INT NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`)
 );
 ```
