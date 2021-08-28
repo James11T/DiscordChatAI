@@ -61,6 +61,7 @@ async def on_message(message):
         prompt_improvement = True
         response_message = await message.channel.send(config["UNKNOWN_RESPONSE"])
     else:
+        response = response.replace("$(author)", message.author.mention)
         response_message = await message.channel.send(response)
         await add_reactions(response_message)
 
